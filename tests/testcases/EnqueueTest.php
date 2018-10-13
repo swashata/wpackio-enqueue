@@ -54,6 +54,11 @@ class EnqueueTest extends TestCase {
 		$this->assertTrue( has_action( 'admin_head', 'WPackio\\Enqueue->printPublicPath()', 2 ) );
 	}
 
+	public function test_construct_throws_on_invalid_type() {
+		$this->expectException('\LogicException');
+		$enqueue = new \WPackio\Enqueue( 'foo', 'dist', '1.0.0', 'aasdasd', '/plugin/path/plugin.php' );
+	}
+
 	public function test_printPublicPath_for_plugin() {
 		$enqueue = new \WPackio\Enqueue( 'foo', 'dist', '1.0.0', 'plugin', '/plugin/path/plugin.php' );
 		ob_start();
@@ -98,6 +103,12 @@ class EnqueueTest extends TestCase {
 		$this->expectException( '\LogicException' );
 		$enqueue = new \WPackio\Enqueue( 'foo', 'dist', '1.0.0', 'plugin', $this->pp );
 		$enqueue->getManifest( 'broken' );
+	}
+
+	public function test_getAssets_throws_on_invalid_entrypoint() {
+		$this->expectException('\LogicException');
+		$enqueue = new \WPackio\Enqueue( 'foo', 'dist', '1.0.0', 'theme' );
+		$enqueue->getAssets( 'app', 'noop', [] );
 	}
 
 	public function test_getAssets_for_theme() {
