@@ -1,5 +1,7 @@
 # WPACK.IO Enqueue API
 
+[![codecov](https://codecov.io/gh/swashata/wpackio-enqueue/branch/master/graph/badge.svg)](https://codecov.io/gh/swashata/wpackio-enqueue) [![Latest Stable Version](https://poser.pugx.org/wpackio/enqueue/v/stable)](https://packagist.org/packages/wpackio/enqueue)
+
 This is the PHP companion of [`@wpackio/scripts`](https://github.com/swashata/wp-webpack-script).
 
 It gives you all the APIs you will need to properly consume assets generated from
@@ -9,7 +11,7 @@ It gives you all the APIs you will need to properly consume assets generated fro
 
 ### Using Composer
 
-We recommend using [composer](https://getcomposer.org/) for using this library.
+We recommend using [composer](https://getcomposer.org/) for using this [library](https://packagist.org/packages/wpackio/enqueue).
 
 ```bash
 composer require wpackio/enqueue
