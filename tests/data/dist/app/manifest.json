@@ -1,0 +1,35 @@
+{
+  "app/assets/image.png": "app/assets/asset-c7cf665262fc289aea5bbe16b4f9aa67.png",
+  "main.css": "app/main.css",
+  "main.css.map": "app/main.css.map",
+  "main.js": "app/main.js",
+  "main.js.map": "app/main.js.map",
+  "mobile.js": "app/mobile.js",
+  "mobile.js.map": "app/mobile.js.map",
+  "wpackioEp": {
+    "main": {
+      "css": [
+        "app/main.css",
+        "app/foo.css"
+      ],
+      "js": [
+        "app/main.js",
+        "app/foo.js"
+      ],
+      "css.map": [
+        "app/main.css.map"
+      ],
+      "js.map": [
+        "app/main.js.map"
+      ]
+    },
+    "mobile": {
+      "js": [
+        "app/mobile.js"
+      ],
+      "js.map": [
+        "app/mobile.js.map"
+      ]
+    }
+  }
+}
