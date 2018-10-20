@@ -6,28 +6,32 @@
   "main.js.map": "app/main.js.map",
   "mobile.js": "app/mobile.js",
   "mobile.js.map": "app/mobile.js.map",
+  "runtime.js": "app/runtime.js",
+  "runtime.js.map": "app/runtime.js.map",
   "wpackioEp": {
     "main": {
-      "css": [
-        "app/main.css",
-        "app/foo.css"
-      ],
       "js": [
-        "app/main.js",
-        "app/foo.js"
+        "app/runtime.js",
+        "app/main.js"
+      ],
+      "js.map": [
+        "app/runtime.js.map",
+        "app/main.js.map"
+      ],
+      "css": [
+        "app/main.css"
       ],
       "css.map": [
         "app/main.css.map"
-      ],
-      "js.map": [
-        "app/main.js.map"
       ]
     },
     "mobile": {
       "js": [
+        "app/runtime.js",
         "app/mobile.js"
       ],
       "js.map": [
+        "app/runtime.js.map",
         "app/mobile.js.map"
       ]
     }

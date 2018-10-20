@@ -6,38 +6,42 @@
   'main.js.map' => 'app/main.js.map',
   'mobile.js' => 'app/mobile.js',
   'mobile.js.map' => 'app/mobile.js.map',
+  'runtime.js' => 'app/runtime.js',
+  'runtime.js.map' => 'app/runtime.js.map',
   'wpackioEp' => 
   array (
     'main' => 
     array (
+      'js' => 
+      array (
+        0 => 'app/runtime.js',
+        1 => 'app/main.js',
+      ),
+      'js.map' => 
+      array (
+        0 => 'app/runtime.js.map',
+        1 => 'app/main.js.map',
+      ),
       'css' => 
       array (
         0 => 'app/main.css',
-        1 => 'app/foo.css',
-      ),
-      'js' => 
-      array (
-        0 => 'app/main.js',
-        1 => 'app/foo.js',
       ),
       'css.map' => 
       array (
         0 => 'app/main.css.map',
-      ),
-      'js.map' => 
-      array (
-        0 => 'app/main.js.map',
       ),
     ),
     'mobile' => 
     array (
       'js' => 
       array (
-        0 => 'app/mobile.js',
+        0 => 'app/runtime.js',
+        1 => 'app/mobile.js',
       ),
       'js.map' => 
       array (
-        0 => 'app/mobile.js.map',
+        0 => 'app/runtime.js.map',
+        1 => 'app/mobile.js.map',
       ),
     ),
   ),

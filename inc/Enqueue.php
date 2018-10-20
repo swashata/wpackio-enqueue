@@ -194,6 +194,12 @@ class Enqueue {
 		if ( $config['js'] && isset( $enqueue['js'] ) && count( (array) $enqueue['js'] ) ) {
 			foreach ( $enqueue['js'] as $index => $js ) {
 				$handle = $identifier . '_' . $index;
+				// If the js is runtime, then use an unique handle
+				if ( $js === $dir . '/runtime.js' ) {
+					$handle = 'wpackio_' . $this->appName . $dir . '_runtime';
+					// By making it unique, we rely on WordPress to only
+					// enqueue it once.
+				}
 				$js_handles[] = [
 					'handle' => $handle,
 					'url' => $this->getUrl( $js ),

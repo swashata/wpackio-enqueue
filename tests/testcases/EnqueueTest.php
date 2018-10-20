@@ -172,6 +172,45 @@ class EnqueueTest extends TestCase {
 		$this->assertMatchesSnapshot( $assets );
 	}
 
+	public function test_getAssets_has_same_handle_for_every_runtime() {
+		$runtime_handles = [];
+		$enqueue = new \WPackio\Enqueue( 'foo', 'dist', '1.0.0', 'plugin', $this->pp );
+		$ass_main = $enqueue->getAssets( 'app', 'main', [
+			'js' => true,
+			'css' => true,
+			'js_dep' => [],
+			'css_dep' => [],
+			'identifier' => false,
+			'in_footer' => true,
+			'media' => 'all',
+		] );
+		$ass_mobile = $enqueue->getAssets( 'app', 'mobile', [
+			'js' => true,
+			'css' => true,
+			'js_dep' => [],
+			'css_dep' => [],
+			'identifier' => false,
+			'in_footer' => true,
+			'media' => 'all',
+		] );
+
+		foreach ( $ass_main['js'] as $js ) {
+			if ( strpos( $js['url'], 'runtime.js' ) !== false ) {
+				$runtime_handles[] = $js['handle'];
+			}
+		}
+		foreach ( $ass_mobile['js'] as $js ) {
+			if ( strpos( $js['url'], 'runtime.js' ) !== false ) {
+				$runtime_handles[] = $js['handle'];
+			}
+		}
+		$this->assertTrue(
+			count( array_unique( $runtime_handles ) ) === 1
+			&& end( $runtime_handles ) === 'wpackio_fooapp_runtime'
+		);
+	}
+
+
 	public function test_enqueue() {
 		// Get the manifest beforehand for assertion
 		$path_to_manifest = dirname( $this->pp ) . '/dist/app/manifest.json';

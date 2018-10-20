@@ -6,23 +6,18 @@
       'handle' => 'wpackIoAppMain_0_css',
       'url' => 'http://example.com/path/to/plugin/dist/app/main.css',
     ),
-    1 => 
-    array (
-      'handle' => 'wpackIoAppMain_1_css',
-      'url' => 'http://example.com/path/to/plugin/dist/app/foo.css',
-    ),
   ),
   'js' => 
   array (
     0 => 
     array (
-      'handle' => 'wpackIoAppMain_0',
-      'url' => 'http://example.com/path/to/plugin/dist/app/main.js',
+      'handle' => 'wpackio_fooapp_runtime',
+      'url' => 'http://example.com/path/to/plugin/dist/app/runtime.js',
     ),
     1 => 
     array (
       'handle' => 'wpackIoAppMain_1',
-      'url' => 'http://example.com/path/to/plugin/dist/app/foo.js',
+      'url' => 'http://example.com/path/to/plugin/dist/app/main.js',
     ),
   ),
 );
