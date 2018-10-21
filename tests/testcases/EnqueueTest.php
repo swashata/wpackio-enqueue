@@ -45,6 +45,7 @@ class EnqueueTest extends TestCase {
 		\Brain\Monkey\Functions\stubs([
 			'esc_js',
 			'wp_parse_args',
+			'sanitize_title_with_dashes'
 		]);
 	}
 	public function test_construct() {
@@ -204,9 +205,10 @@ class EnqueueTest extends TestCase {
 				$runtime_handles[] = $js['handle'];
 			}
 		}
+
 		$this->assertTrue(
 			count( array_unique( $runtime_handles ) ) === 1
-			&& end( $runtime_handles ) === 'wpackio_fooapp_runtime'
+			&& end( $runtime_handles ) === 'wpackio_fooapp_app/runtime.js'
 		);
 	}
 

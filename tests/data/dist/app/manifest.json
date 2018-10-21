@@ -12,10 +12,12 @@
     "main": {
       "js": [
         "app/runtime.js",
+        "app/vendor.js",
         "app/main.js"
       ],
       "js.map": [
         "app/runtime.js.map",
+        "app/vendor.js.map",
         "app/main.js.map"
       ],
       "css": [
@@ -28,10 +30,12 @@
     "mobile": {
       "js": [
         "app/runtime.js",
+        "app/vendor.js",
         "app/mobile.js"
       ],
       "js.map": [
         "app/runtime.js.map",
+        "app/vendor.js.map",
         "app/mobile.js.map"
       ]
     }

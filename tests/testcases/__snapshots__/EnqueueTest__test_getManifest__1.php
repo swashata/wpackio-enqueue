@@ -15,12 +15,14 @@
       'js' => 
       array (
         0 => 'app/runtime.js',
-        1 => 'app/main.js',
+        1 => 'app/vendor.js',
+        2 => 'app/main.js',
       ),
       'js.map' => 
       array (
         0 => 'app/runtime.js.map',
-        1 => 'app/main.js.map',
+        1 => 'app/vendor.js.map',
+        2 => 'app/main.js.map',
       ),
       'css' => 
       array (
@@ -36,12 +38,14 @@
       'js' => 
       array (
         0 => 'app/runtime.js',
-        1 => 'app/mobile.js',
+        1 => 'app/vendor.js',
+        2 => 'app/mobile.js',
       ),
       'js.map' => 
       array (
         0 => 'app/runtime.js.map',
-        1 => 'app/mobile.js.map',
+        1 => 'app/vendor.js.map',
+        2 => 'app/mobile.js.map',
       ),
     ),
   ),

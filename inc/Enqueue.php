@@ -182,10 +182,7 @@ class Enqueue {
 		$enqueue = $manifest['wpackioEp'][ $entryPoint ];
 
 		// Set the identifier
-		$identifier = $config['identifier'];
-		if ( false === $identifier ) {
-			$identifier = 'wpackIo' . ucfirst( $dir ) . ucfirst( $entryPoint );
-		}
+		$identifier = 'wpackio_' . $this->appName . $dir . '_';
 
 		$js_handles = [];
 		$css_handles = [];
@@ -193,13 +190,13 @@ class Enqueue {
 		// Figure out all javascript assets
 		if ( $config['js'] && isset( $enqueue['js'] ) && count( (array) $enqueue['js'] ) ) {
 			foreach ( $enqueue['js'] as $index => $js ) {
-				$handle = $identifier . '_' . $index;
+				$handle = $identifier . $js;
 				// If the js is runtime, then use an unique handle
-				if ( $js === $dir . '/runtime.js' ) {
-					$handle = 'wpackio_' . $this->appName . $dir . '_runtime';
-					// By making it unique, we rely on WordPress to only
-					// enqueue it once.
-				}
+				// if ( $js === $dir . '/runtime.js' ) {
+				// $handle = 'wpackio_' . $this->appName . $dir . '_runtime';
+				// By making it unique, we rely on WordPress to only
+				// enqueue it once.
+				// }
 				$js_handles[] = [
 					'handle' => $handle,
 					'url' => $this->getUrl( $js ),
@@ -234,7 +231,6 @@ class Enqueue {
 	 * `css` (`boolean`) True if we are to include stylesheets.
 	 * `js_dep` (`array`) Additional dependencies for the javascript assets.
 	 * `css_dep` (`array`) Additional dependencies for the stylesheet assets.
-	 * `identifier` (`string`|`false`) A custom prefix to generate the handle of assets.
 	 * `in_footer` (`boolean`) Whether to print the assets in footer (for js only).
 	 * `media` (`string`) Media attribute for stylesheets (defaults `'all'`).
 	 *
@@ -249,7 +245,6 @@ class Enqueue {
 				'css' => true,
 				'js_dep' => [],
 				'css_dep' => [],
-				'identifier' => false,
 				'in_footer' => true,
 				'media' => 'all',
 			]
