@@ -219,10 +219,12 @@ class EnqueueTest extends TestCase {
 		$manifest = json_decode( file_get_contents( $path_to_manifest ), true );
 
 		// Loop over all js and make sure wp_enqueue_script is called
+		$dependencies = [];
 		foreach ( $manifest['wpackioEp']['main']['js'] as $js_path ) {
 			\Brain\Monkey\Functions\expect( 'wp_enqueue_script' )
 				->once()
-				->with( \Mockery::type('string'), $this->pu . '/' . $js_path, [ 'jquery' ], '1.0.0', true );
+				->with( \Mockery::type('string'), $this->pu . '/' . $js_path, array_merge( [ 'jquery' ], $dependencies ), '1.0.0', true );
+			$dependencies[] = 'wpackio_fooapp_' . $js_path;
 		}
 		// Loop over all css and make sure wp_enqueue_style is called
 		foreach ( $manifest['wpackioEp']['main']['css'] as $css_path ) {

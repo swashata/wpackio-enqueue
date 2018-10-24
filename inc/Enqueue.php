@@ -140,9 +140,14 @@ class Enqueue {
 		$jses = $assets['js'];
 		$csses = $assets['css'];
 
+		// Hold a flag to calculate dependencies
+		$dependencies = [];
+
 		foreach ( $jses as $js ) {
 			if ( $config['js'] ) {
-				\wp_enqueue_script( $js['handle'], $js['url'], $config['js_dep'], $this->version, $config['in_footer'] );
+				\wp_enqueue_script( $js['handle'], $js['url'], array_merge( $config['js_dep'], $dependencies ), $this->version, $config['in_footer'] );
+				// The next one depends on this one
+				$dependencies[] = $js['handle'];
 			}
 		}
 
