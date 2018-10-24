@@ -20,6 +20,12 @@ Now let's dive in.
 3. Update the README.md with details of changes to the interface, this includes new environment
    variables, exposed ports, useful file locations and container parameters.
 
+## Release a version
+
+1. Ensure you have `npx` installed.
+2. Run `composer run-script changelog <new version>`, like `composer run-script changelog 2.0.0`.
+3. Commit the changelog and tag it.
+
 # Conduct
 
 We are committed to providing a friendly, safe and welcoming environment for

@@ -27,7 +27,8 @@
     },
     "scripts": {
       "test": "phpunit --colors=auto",
-      "lint": "phpcs -v inc/*"
+      "lint": "phpcs -v inc/*",
+      "changelog": "npx auto-changelog --template keepachangelog -v"
     },
     "archive": {
       "exclude": [
