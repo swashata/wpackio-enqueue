@@ -120,44 +120,125 @@ class Enqueue {
 	}
 
 	/**
+	 * Register script handles with WordPress for an entrypoint inside a source.
+	 * It does not enqueue the assets, just calls wp_register_* on the asset.
+	 *
+	 * This is useful if just registering script for things like gutenberg.
+	 *
+	 * @throws \LogicException If manifest.json is not found in the directory.
+	 *
+	 * @see \WPackio\Enqueue::normalizeAssetConfig
+	 *
+	 * @param string $name The name of the files entry.
+	 * @param string $entryPoint Which entrypoint would you like to enqueue.
+	 * @param array  $config Additional configuration.
+	 * @return array Associative with `css` and `js`. Each of them are arrays
+	 *               containing ['handle' => string, 'url' => string].
+	 */
+	public function register( $name, $entryPoint, $config ) {
+		$config = $this->normalizeAssetConfig( $config );
+		// Get asset urls
+		$assets = $this->getAssets( $name, $entryPoint, $config );
+		// Enqueue all js
+		$jses = $assets['js'];
+		$csses = $assets['css'];
+
+		// Hold a flag to calculate dependencies
+		$js_deps = [];
+		$css_deps = [];
+
+		// Register javascript files
+		if ( $config['js'] ) {
+			foreach ( $jses as $js ) {
+				\wp_register_script(
+					$js['handle'],
+					$js['url'],
+					array_merge( $config['js_dep'], $js_deps ),
+					$this->version,
+					$config['in_footer']
+				);
+				// The next one depends on this one
+				$js_deps[] = $js['handle'];
+			}
+		}
+
+		// Register CSS files
+		if ( $config['css'] ) {
+			foreach ( $csses as $css ) {
+				\wp_register_style(
+					$css['handle'],
+					$css['url'],
+					array_merge( $config['css_dep'], $css_deps ),
+					$this->version,
+					$config['media']
+				);
+				// The next one depends on this one
+				$css_deps[] = $css['handle'];
+			}
+		}
+
+		return $assets;
+	}
+
+	/**
 	 * Enqueue all the assets for an entrypoint inside a source.
 	 *
 	 * @throws \LogicException If manifest.json is not found in the directory.
 	 *
 	 * @see \WPackio\Enqueue::normalizeAssetConfig
 	 *
-	 * @param string $dir The name of the source directory.
+	 * @param string $name The name of the files entry.
 	 * @param string $entryPoint Which entrypoint would you like to enqueue.
 	 * @param array  $config Additional configuration.
 	 * @return array Associative with `css` and `js`. Each of them are arrays
 	 *               containing ['handle' => string, 'url' => string].
 	 */
-	public function enqueue( $dir, $entryPoint, $config ) {
+	public function enqueue( $name, $entryPoint, $config ) {
 		$config = $this->normalizeAssetConfig( $config );
-		// Get asset urls
-		$assets = $this->getAssets( $dir, $entryPoint, $config );
+		// Register with WordPress and get asset handles
+		$assets = $this->register( $name, $entryPoint, $config );
 		// Enqueue all js
 		$jses = $assets['js'];
 		$csses = $assets['css'];
 
-		// Hold a flag to calculate dependencies
-		$dependencies = [];
-
-		foreach ( $jses as $js ) {
-			if ( $config['js'] ) {
-				\wp_enqueue_script( $js['handle'], $js['url'], array_merge( $config['js_dep'], $dependencies ), $this->version, $config['in_footer'] );
-				// The next one depends on this one
-				$dependencies[] = $js['handle'];
+		if ( $config['js'] ) {
+			foreach ( $jses as $js ) {
+				\wp_enqueue_script( $js['handle'] );
 			}
 		}
 
-		foreach ( $csses as $css ) {
-			if ( $config['css'] ) {
-				wp_enqueue_style( $css['handle'], $css['url'], $config['css_dep'], $this->version, $config['media'] );
+		if ( $config['css'] ) {
+			foreach ( $csses as $css ) {
+				\wp_enqueue_style( $css['handle'] );
 			}
 		}
 
 		return $assets;
+	}
+
+	/**
+	 * Get handle for a script or style where it would be unique based on
+	 * name, path and type.
+	 *
+	 * @throws \LogicException If $type is not script or style.
+	 *
+	 * @param string $name The name of the files entry.
+	 * @param string $path Asset path from manifest file.
+	 * @param string $type Either 'script' or 'style'.
+	 *
+	 * @return string Unique handle for this asset.
+	 */
+	public function getHandle( $name, $path, $type = 'script' ) {
+		if ( ! \in_array( $type, [ 'script', 'style' ] ) ) {
+			throw new \LogicException( 'Type has to be either script or style.' );
+		}
+		return 'wpackio_'
+			. $this->appName
+			. $name
+			. '_'
+			. $path
+			. '_'
+			. $type;
 	}
 
 	/**
@@ -170,24 +251,21 @@ class Enqueue {
 	 *
 	 * @see \WPackio\Enqueue::normalizeAssetConfig
 	 *
-	 * @param string $dir The name of the source directory.
+	 * @param string $name The name of the files entry.
 	 * @param string $entryPoint Which entrypoint would you like to enqueue.
 	 * @param array  $config Additional configuration.
 	 * @return array Associative with `css` and `js`. Each of them are arrays
 	 *               containing ['handle' => string, 'url' => string].
 	 */
-	public function getAssets( $dir, $entryPoint, $config ) {
+	public function getAssets( $name, $entryPoint, $config ) {
 		$config = $this->normalizeAssetConfig( $config );
 		// Get the manifest
-		$manifest = $this->getManifest( $dir );
+		$manifest = $this->getManifest( $name );
 		// Get the entrypoint
 		if ( ! isset( $manifest['wpackioEp'][ $entryPoint ] ) ) {
 			throw new \LogicException( 'No entry point found in the manifest' );
 		}
 		$enqueue = $manifest['wpackioEp'][ $entryPoint ];
-
-		// Set the identifier
-		$identifier = 'wpackio_' . $this->appName . $dir . '_';
 
 		$js_handles = [];
 		$css_handles = [];
@@ -195,7 +273,7 @@ class Enqueue {
 		// Figure out all javascript assets
 		if ( $config['js'] && isset( $enqueue['js'] ) && count( (array) $enqueue['js'] ) ) {
 			foreach ( $enqueue['js'] as $index => $js ) {
-				$handle = $identifier . $js;
+				$handle = $this->getHandle( $name, $js, 'script' );
 				// If the js is runtime, then use an unique handle
 				// if ( $js === $dir . '/runtime.js' ) {
 				// $handle = 'wpackio_' . $this->appName . $dir . '_runtime';
@@ -212,7 +290,7 @@ class Enqueue {
 		// Figure out all css assets
 		if ( $config['css'] && isset( $enqueue['css'] ) && count( (array) $enqueue['css'] ) ) {
 			foreach ( $enqueue['css'] as $index => $css ) {
-				$handle = $identifier . '_' . $index . '_css';
+				$handle = $this->getHandle( $name, $css, 'style' );
 				$css_handles[] = [
 					'handle' => $handle,
 					'url' => $this->getUrl( $css ),

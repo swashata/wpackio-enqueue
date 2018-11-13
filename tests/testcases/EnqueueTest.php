@@ -208,33 +208,41 @@ class EnqueueTest extends TestCase {
 
 		$this->assertTrue(
 			count( array_unique( $runtime_handles ) ) === 1
-			&& end( $runtime_handles ) === 'wpackio_fooapp_app/runtime.js'
+			&& end( $runtime_handles ) === $enqueue->getHandle( 'app', 'app/runtime.js', 'script' )
 		);
 	}
 
 
-	public function test_enqueue() {
+	public function test_register() {
 		// Get the manifest beforehand for assertion
 		$path_to_manifest = dirname( $this->pp ) . '/dist/app/manifest.json';
 		$manifest = json_decode( file_get_contents( $path_to_manifest ), true );
 
-		// Loop over all js and make sure wp_enqueue_script is called
-		$dependencies = [];
+		// Prepare
+		$enqueue = new \WPackio\Enqueue( 'foo', 'dist', '1.0.0', 'plugin', $this->pp );
+
+		// Loop over all js and make sure wp_register_script is called
+		$js_deps = [];
+		$css_deps = [];
+
 		foreach ( $manifest['wpackioEp']['main']['js'] as $js_path ) {
-			\Brain\Monkey\Functions\expect( 'wp_enqueue_script' )
+			$js_handle = $enqueue->getHandle( 'app', $js_path, 'script' );
+			\Brain\Monkey\Functions\expect( 'wp_register_script' )
 				->once()
-				->with( \Mockery::type('string'), $this->pu . '/' . $js_path, array_merge( [ 'jquery' ], $dependencies ), '1.0.0', true );
-			$dependencies[] = 'wpackio_fooapp_' . $js_path;
+				->with( $js_handle, $this->pu . '/' . $js_path, array_merge( [ 'jquery' ], $js_deps ), '1.0.0', true );
+			$js_deps[] = $js_handle;
 		}
-		// Loop over all css and make sure wp_enqueue_style is called
+		// Loop over all css and make sure wp_register_style is called
 		foreach ( $manifest['wpackioEp']['main']['css'] as $css_path ) {
-			\Brain\Monkey\Functions\expect( 'wp_enqueue_style' )
+			$css_handle = $enqueue->getHandle( 'app', $css_path, 'style' );
+			\Brain\Monkey\Functions\expect( 'wp_register_style' )
 				->once()
-				->with( \Mockery::type('string'), $this->pu . '/' . $css_path, [ 'ui' ], '1.0.0', 'all' );
+				->with( $css_handle, $this->pu . '/' . $css_path, array_merge( [ 'ui' ], $css_deps ), '1.0.0', 'all' );
+			$css_deps[] = $css_handle;
 		}
 
-		$enqueue = new \WPackio\Enqueue( 'foo', 'dist', '1.0.0', 'plugin', $this->pp );
-		$enqueue_assets = $enqueue->enqueue( 'app', 'main', [
+
+		$enqueue_assets = $enqueue->register( 'app', 'main', [
 			'js' => true,
 			'css' => true,
 			'js_dep' => [ 'jquery' ],
@@ -247,4 +255,66 @@ class EnqueueTest extends TestCase {
 		$this->assertMatchesSnapshot( $enqueue_assets );
 	}
 
+	public function test_enqueue() {
+		// Arrange
+		$config = [
+			'js' => true,
+			'css' => true,
+			'js_dep' => [ 'jquery' ],
+			'css_dep' => [ 'ui' ],
+			'identifier' => false,
+			'in_footer' => true,
+			'media' => 'all',
+		];
+
+		$expected_return = [
+			'js' => [
+				[
+					'handle' => 'js_foo',
+				],
+				[
+					'handle' => 'js_bar',
+				],
+			],
+			'css' => [
+				[
+					'handle' => 'css_foo',
+				],
+				[
+					'handle' => 'css_bar',
+				],
+			],
+		];
+
+		// Assert
+		$enqueue = $this->getMockBuilder(\WPackio\Enqueue::class)
+			->setConstructorArgs( [ 'foo', 'dist', '1.0.0', 'plugin', $this->pp ] )
+			->setMethods( [ 'register' ] )
+			->getMock();
+
+		$enqueue->expects( $this->once() )
+			->method( 'register' )
+			->with( 'app', 'main', $config )
+			->willReturn( $expected_return );
+
+		foreach ( $expected_return['js'] as $js ) {
+			\Brain\Monkey\Functions\expect( 'wp_enqueue_script' )
+				->once()
+				->with( $js['handle'] );
+		}
+		foreach ( $expected_return['css'] as $css ) {
+			\Brain\Monkey\Functions\expect( 'wp_enqueue_style' )
+				->once()
+				->with( $css['handle'] );
+		}
+
+		// Act
+		$enqueue->enqueue( 'app', 'main', $config );
+	}
+
+	public function test_getHandle_throws_exception() {
+		$this->expectException( '\LogicException' );
+		$enqueue = new \WPackio\Enqueue( 'foo', 'dist', '1.0.0', 'plugin', $this->pp );
+		$enqueue->getHandle( 'foo', 'bar', 'baz' );
+	}
 }

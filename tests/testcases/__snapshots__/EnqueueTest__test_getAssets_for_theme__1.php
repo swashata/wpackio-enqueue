@@ -3,7 +3,7 @@
   array (
     0 => 
     array (
-      'handle' => 'wpackio_fooapp__0_css',
+      'handle' => 'wpackio_fooapp_app/main.css_style',
       'url' => 'http://example.com/path/to/template/directory/dist/app/main.css',
     ),
   ),
@@ -11,17 +11,17 @@
   array (
     0 => 
     array (
-      'handle' => 'wpackio_fooapp_app/runtime.js',
+      'handle' => 'wpackio_fooapp_app/runtime.js_script',
       'url' => 'http://example.com/path/to/template/directory/dist/app/runtime.js',
     ),
     1 => 
     array (
-      'handle' => 'wpackio_fooapp_app/vendor.js',
+      'handle' => 'wpackio_fooapp_app/vendor.js_script',
       'url' => 'http://example.com/path/to/template/directory/dist/app/vendor.js',
     ),
     2 => 
     array (
-      'handle' => 'wpackio_fooapp_app/main.js',
+      'handle' => 'wpackio_fooapp_app/main.js_script',
       'url' => 'http://example.com/path/to/template/directory/dist/app/main.js',
     ),
   ),
