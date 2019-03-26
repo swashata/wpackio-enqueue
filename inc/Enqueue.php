@@ -90,8 +90,8 @@ class Enqueue {
 		$this->pluginPath = $pluginPath;
 
 		// Set the root path and URL
-		$filepath = \trailingslashit( \get_template_directory() ) . $this->outputPath . '/';
-		$url = \trailingslashit( \get_template_directory_uri() ) . $this->outputPath . '/';
+		$filepath = \trailingslashit( \get_stylesheet_directory() ) . $this->outputPath . '/';
+		$url = \trailingslashit( \get_stylesheet_directory_uri() ) . $this->outputPath . '/';
 		if ( 'plugin' === $this->type ) {
 			$filepath = \trailingslashit( dirname( $this->pluginPath ) ) . $this->outputPath . '/';
 			$url = \trailingslashit( \plugins_url( $this->outputPath, $this->pluginPath ) );

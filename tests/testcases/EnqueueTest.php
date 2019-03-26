@@ -37,8 +37,8 @@ class EnqueueTest extends TestCase {
 		// Stub out a few functions we will need
 		// with predefined output
 		\Brain\Monkey\Functions\stubs([
-			'get_template_directory' => $this->td,
-			'get_template_directory_uri' => $this->tdu,
+			'get_stylesheet_directory' => $this->td,
+			'get_stylesheet_directory_uri' => $this->tdu,
 			'plugins_url' => $this->pu,
 		]);
 		// Stub some returnFirstArguments function
