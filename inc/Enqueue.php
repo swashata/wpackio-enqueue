@@ -78,8 +78,9 @@ class Enqueue {
 	 * @param string         $version Version of your plugin/theme, used to generate query URL.
 	 * @param string         $type The type of enqueue, either 'plugin' or 'theme', same as wpackio.project.js.
 	 * @param string|boolean $pluginPath If this is a plugin, then pass absolute path of the plugin main file, otherwise pass false.
+	 * @param string 				 $themeType If this is a theme, then you can declare if it is a 'child' or 'regular' theme.
 	 */
-	public function __construct( $appName, $outputPath, $version, $type = 'plugin', $pluginPath = false ) {
+	public function __construct( $appName, $outputPath, $version, $type = 'plugin', $pluginPath = false, $themeType = 'regular' ) {
 		$this->appName = $appName;
 		$this->outputPath = $outputPath;
 		$this->version = $version;
@@ -88,10 +89,18 @@ class Enqueue {
 		}
 		$this->type = $type;
 		$this->pluginPath = $pluginPath;
+		$this->themeType = $themeType;
+		$themePath = get_template_directory();
+		$themeUri = get_template_directory_uri();
+
+		if ( $this->type === 'theme' && $this->$themeType === 'child' ) {
+			$themePath = get_stylesheet_directory();
+			$themeUri = get_stylesheet_directory_uri();
+		}
 
 		// Set the root path and URL
-		$filepath = \trailingslashit( \get_stylesheet_directory() ) . $this->outputPath . '/';
-		$url = \trailingslashit( \get_stylesheet_directory_uri() ) . $this->outputPath . '/';
+		$filepath = \trailingslashit( $themePath ) . $this->outputPath . '/';
+		$url = \trailingslashit( $themeUri ) . $this->outputPath . '/';
 		if ( 'plugin' === $this->type ) {
 			$filepath = \trailingslashit( dirname( $this->pluginPath ) ) . $this->outputPath . '/';
 			$url = \trailingslashit( \plugins_url( $this->outputPath, $this->pluginPath ) );

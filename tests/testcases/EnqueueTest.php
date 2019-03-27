@@ -15,6 +15,12 @@ class EnqueueTest extends TestCase {
 	protected $tdu = 'http://example.com/path/to/template/directory';
 
 	/**
+	 * Mocked Child Theme Directory Uri
+	 * @var string
+	 */
+	protected $childThemeTemplateDirectoryUri = 'http://example.com/path/to/child_theme_template/directory';
+
+	/**
 	 * Mocked Template Directory path.
 	 * @var string
 	 */
@@ -37,8 +43,9 @@ class EnqueueTest extends TestCase {
 		// Stub out a few functions we will need
 		// with predefined output
 		\Brain\Monkey\Functions\stubs([
-			'get_stylesheet_directory' => $this->td,
-			'get_stylesheet_directory_uri' => $this->tdu,
+			'get_template_directory' => $this->td,
+			'get_template_directory_uri' => $this->tdu,
+			'get_stylesheet_directory_uri' => $this->childThemeTemplateDirectoryUri,
 			'plugins_url' => $this->pu,
 		]);
 		// Stub some returnFirstArguments function
@@ -69,7 +76,7 @@ class EnqueueTest extends TestCase {
 	}
 
 	public function test_printPublicPath_for_theme() {
-		$enqueue = new \WPackio\Enqueue( 'foo', 'dist', '1.0.0', 'theme' );
+		$enqueue = new \WPackio\Enqueue( 'foo', 'dist', '1.0.0', 'theme', false, 'regular' );
 		ob_start();
 		$enqueue->printPublicPath();
 		$result = ob_get_clean();
@@ -77,7 +84,7 @@ class EnqueueTest extends TestCase {
 	}
 
 	public function test_getUrl_for_theme() {
-		$enqueue = new \WPackio\Enqueue( 'foo', 'dist', '1.0.0', 'theme' );
+		$enqueue = new \WPackio\Enqueue( 'foo', 'dist', '1.0.0', 'theme', false, 'regular' );
 		$this->assertEquals( $this->tdu . '/dist/app/main.js', $enqueue->getUrl( 'app/main.js' ) );
 	}
 
@@ -108,12 +115,12 @@ class EnqueueTest extends TestCase {
 
 	public function test_getAssets_throws_on_invalid_entrypoint() {
 		$this->expectException('\LogicException');
-		$enqueue = new \WPackio\Enqueue( 'foo', 'dist', '1.0.0', 'theme' );
+		$enqueue = new \WPackio\Enqueue( 'foo', 'dist', '1.0.0', 'theme', false, 'regular' );
 		$enqueue->getAssets( 'app', 'noop', [] );
 	}
 
-	public function test_getAssets_for_theme() {
-		$enqueue = new \WPackio\Enqueue( 'foo', 'dist', '1.0.0', 'theme' );
+	public function test_getAssets_for_regular_theme() {
+		$enqueue = new \WPackio\Enqueue( 'foo', 'dist', '1.0.0', 'theme', false, 'regular' );
 		$assets = $enqueue->getAssets( 'app', 'main', [
 			'js' => true,
 			'css' => true,
@@ -138,6 +145,37 @@ class EnqueueTest extends TestCase {
 			$this->assertArrayHasKey( 'url', $css );
 			$this->assertArrayHasKey( 'handle', $css );
 			$this->assertContains( $this->tdu . '/dist/app/', $css['url'] );
+		}
+
+		$this->assertMatchesSnapshot( $assets );
+	}
+
+	public function test_getAssets_for_child_theme() {
+		$enqueue = new \WPackio\Enqueue( 'foo', 'dist', '1.0.0', 'theme', false, 'child' );
+		$assets = $enqueue->getAssets( 'app', 'main', [
+			'js' => true,
+			'css' => true,
+			'js_dep' => [],
+			'css_dep' => [],
+			'identifier' => false,
+			'in_footer' => true,
+			'media' => 'all',
+		] );
+		// expect on js
+		$this->assertArrayHasKey( 'js', $assets );
+		foreach ( $assets['js']  as $js ) {
+			$this->assertArrayHasKey( 'url', $js );
+			$this->assertArrayHasKey( 'handle', $js );
+			$this->assertContains( $this->childThemeTemplateDirectoryUri . '/dist/app/', $js['url'] );
+		}
+
+
+		// expect on js
+		$this->assertArrayHasKey( 'css', $assets );
+		foreach ( $assets['css']  as $css ) {
+			$this->assertArrayHasKey( 'url', $css );
+			$this->assertArrayHasKey( 'handle', $css );
+			$this->assertContains( $this->childThemeTemplateDirectoryUri . '/dist/app/', $css['url'] );
 		}
 
 		$this->assertMatchesSnapshot( $assets );
