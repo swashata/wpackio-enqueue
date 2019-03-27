@@ -69,6 +69,13 @@ class Enqueue {
 	private $appName = '';
 
 	/**
+	 * Theme type ('child' or 'regular').
+	 *
+	 * @var string
+	 */
+	private $themeType = '';
+
+	/**
 	 * Create an instance of the Enqueue helper class.
 	 *
 	 * @throws \LogicException If $type is not plugin or theme.

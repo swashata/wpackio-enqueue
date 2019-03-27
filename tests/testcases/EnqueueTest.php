@@ -83,9 +83,14 @@ class EnqueueTest extends TestCase {
 		$this->assertContains( 'window.__wpackIofoodist=\'' . $this->tdu . '/dist/\'', $result );
 	}
 
-	public function test_getUrl_for_theme() {
+	public function test_getUrl_for_regular_theme() {
 		$enqueue = new \WPackio\Enqueue( 'foo', 'dist', '1.0.0', 'theme', false, 'regular' );
 		$this->assertEquals( $this->tdu . '/dist/app/main.js', $enqueue->getUrl( 'app/main.js' ) );
+	}
+
+	public function test_getUrl_for_child_theme() {
+		$enqueue = new \WPackio\Enqueue( 'foo', 'dist', '1.0.0', 'theme', false, 'child' );
+		$this->assertEquals( $this->childThemeTemplateDirectoryUri . '/dist/app/main.js', $enqueue->getUrl( 'app/main.js' ) );
 	}
 
 	public function test_getUrl_for_plugin() {
@@ -119,7 +124,7 @@ class EnqueueTest extends TestCase {
 		$enqueue->getAssets( 'app', 'noop', [] );
 	}
 
-	public function test_getAssets_for_regular_theme() {
+	public function test_getAssets_for_theme() {
 		$enqueue = new \WPackio\Enqueue( 'foo', 'dist', '1.0.0', 'theme', false, 'regular' );
 		$assets = $enqueue->getAssets( 'app', 'main', [
 			'js' => true,
@@ -145,37 +150,6 @@ class EnqueueTest extends TestCase {
 			$this->assertArrayHasKey( 'url', $css );
 			$this->assertArrayHasKey( 'handle', $css );
 			$this->assertContains( $this->tdu . '/dist/app/', $css['url'] );
-		}
-
-		$this->assertMatchesSnapshot( $assets );
-	}
-
-	public function test_getAssets_for_child_theme() {
-		$enqueue = new \WPackio\Enqueue( 'foo', 'dist', '1.0.0', 'theme', false, 'child' );
-		$assets = $enqueue->getAssets( 'app', 'main', [
-			'js' => true,
-			'css' => true,
-			'js_dep' => [],
-			'css_dep' => [],
-			'identifier' => false,
-			'in_footer' => true,
-			'media' => 'all',
-		] );
-		// expect on js
-		$this->assertArrayHasKey( 'js', $assets );
-		foreach ( $assets['js']  as $js ) {
-			$this->assertArrayHasKey( 'url', $js );
-			$this->assertArrayHasKey( 'handle', $js );
-			$this->assertContains( $this->childThemeTemplateDirectoryUri . '/dist/app/', $js['url'] );
-		}
-
-
-		// expect on js
-		$this->assertArrayHasKey( 'css', $assets );
-		foreach ( $assets['css']  as $css ) {
-			$this->assertArrayHasKey( 'url', $css );
-			$this->assertArrayHasKey( 'handle', $css );
-			$this->assertContains( $this->childThemeTemplateDirectoryUri . '/dist/app/', $css['url'] );
 		}
 
 		$this->assertMatchesSnapshot( $assets );
