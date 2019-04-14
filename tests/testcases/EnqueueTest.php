@@ -12,13 +12,25 @@ class EnqueueTest extends TestCase {
 	 * Mocked Template Directory Uri
 	 * @var string
 	 */
-	protected $tdu = 'http://example.com/path/to/template/directory';
+	protected $templateDirectoryUri = 'http://example.com/path/to/template/directory';
+
+	/**
+	 * Mocked Stylesheet Directory Uri
+	 * @var string
+	 */
+	protected $stylesheetDirectoryUri = 'http://example.com/path/to/child_theme_template/directory';
 
 	/**
 	 * Mocked Template Directory path.
 	 * @var string
 	 */
-	protected $td = __DIR__ . '/../data';
+	protected $templateDirectory = __DIR__ . '/../data';
+
+	/**
+	 * Mocked Stylesheet Directory path.
+	 * @var string
+	 */
+	protected $stylesheetDirectory = __DIR__ . '/../data';
 
 	/**
 	 * Mocked Plugin Uri.
@@ -37,8 +49,10 @@ class EnqueueTest extends TestCase {
 		// Stub out a few functions we will need
 		// with predefined output
 		\Brain\Monkey\Functions\stubs([
-			'get_template_directory' => $this->td,
-			'get_template_directory_uri' => $this->tdu,
+			'get_template_directory' => $this->templateDirectory,
+			'get_template_directory_uri' => $this->templateDirectoryUri,
+			'get_stylesheet_directory' => $this->stylesheetDirectory,
+			'get_stylesheet_directory_uri' => $this->stylesheetDirectoryUri,
 			'plugins_url' => $this->pu,
 		]);
 		// Stub some returnFirstArguments function
@@ -48,6 +62,10 @@ class EnqueueTest extends TestCase {
 			'sanitize_title_with_dashes'
 		]);
 	}
+
+	/**
+	 * @testdox Constructor adds WordPress actions
+	 */
 	public function test_construct() {
 		$enqueue = new \WPackio\Enqueue( 'foo', 'dist', '1.0.0', 'plugin', '/plugin/path/plugin.php' );
 		// We expect hooks on both wp_head and admin_head
@@ -55,11 +73,17 @@ class EnqueueTest extends TestCase {
 		$this->assertTrue( has_action( 'admin_print_scripts', 'WPackio\\Enqueue->printPublicPath()', -1000 ) );
 	}
 
+	/**
+	 * @testdox Constructor throws exception on invalid $type
+	 */
 	public function test_construct_throws_on_invalid_type() {
 		$this->expectException('\LogicException');
 		$enqueue = new \WPackio\Enqueue( 'foo', 'dist', '1.0.0', 'aasdasd', '/plugin/path/plugin.php' );
 	}
 
+	/**
+	 * @testdox `printPublicPath` works for plugins
+	 */
 	public function test_printPublicPath_for_plugin() {
 		$enqueue = new \WPackio\Enqueue( 'foo', 'dist', '1.0.0', 'plugin', '/plugin/path/plugin.php' );
 		ob_start();
@@ -68,24 +92,55 @@ class EnqueueTest extends TestCase {
 		$this->assertContains( 'window.__wpackIofoodist=\'' . $this->pu . '/\'', $result );
 	}
 
-	public function test_printPublicPath_for_theme() {
-		$enqueue = new \WPackio\Enqueue( 'foo', 'dist', '1.0.0', 'theme' );
+	/**
+	 * @testdox `printPublicPath` works for regular themes
+	 */
+	public function test_printPublicPath_for_regular_theme() {
+		$enqueue = new \WPackio\Enqueue( 'foo', 'dist', '1.0.0', 'theme', false, 'regular' );
 		ob_start();
 		$enqueue->printPublicPath();
 		$result = ob_get_clean();
-		$this->assertContains( 'window.__wpackIofoodist=\'' . $this->tdu . '/dist/\'', $result );
+		$this->assertContains( 'window.__wpackIofoodist=\'' . $this->templateDirectoryUri . '/dist/\'', $result );
 	}
 
-	public function test_getUrl_for_theme() {
-		$enqueue = new \WPackio\Enqueue( 'foo', 'dist', '1.0.0', 'theme' );
-		$this->assertEquals( $this->tdu . '/dist/app/main.js', $enqueue->getUrl( 'app/main.js' ) );
+	/**
+	 * @testdox `printPublicPath` works child themes
+	 */
+	public function test_printPublicPath_for_child_theme() {
+		$enqueue = new \WPackio\Enqueue( 'foo', 'dist', '1.0.0', 'theme', false, 'child' );
+		ob_start();
+		$enqueue->printPublicPath();
+		$result = ob_get_clean();
+		$this->assertContains( 'window.__wpackIofoodist=\'' . $this->stylesheetDirectoryUri . '/dist/\'', $result );
 	}
 
+	/**
+	 * @testdox `getUrl` works for regular themes
+	 */
+	public function test_getUrl_for_regular_theme() {
+		$enqueue = new \WPackio\Enqueue( 'foo', 'dist', '1.0.0', 'theme', false, 'regular' );
+		$this->assertEquals( $this->templateDirectoryUri . '/dist/app/main.js', $enqueue->getUrl( 'app/main.js' ) );
+	}
+
+	/**
+	 * @testdox `getUrl` works for child themes
+	 */
+	public function test_getUrl_for_child_theme() {
+		$enqueue = new \WPackio\Enqueue( 'foo', 'dist', '1.0.0', 'theme', false, 'child' );
+		$this->assertEquals( $this->stylesheetDirectoryUri . '/dist/app/main.js', $enqueue->getUrl( 'app/main.js' ) );
+	}
+
+	/**
+	 * @testdox `getUrl` works for plugins
+	 */
 	public function test_getUrl_for_plugin() {
 		$enqueue = new \WPackio\Enqueue( 'foo', 'dist', '1.0.0', 'plugin', '/path/to/plugin.php' );
 		$this->assertEquals( $this->pu . '/app/main.js', $enqueue->getUrl( 'app/main.js' ) );
 	}
 
+	/**
+	 * @testdox `getManifest` works if file is valid
+	 */
 	public function test_getManifest() {
 		$path_to_manifest = dirname( $this->pp ) . '/dist/app/manifest.json';
 		$enqueue = new \WPackio\Enqueue( 'foo', 'dist', '1.0.0', 'plugin', $this->pp );
@@ -94,26 +149,38 @@ class EnqueueTest extends TestCase {
 		$this->assertMatchesSnapshot( $manifest );
 	}
 
+	/**
+	 * @testdox `getManifest` throws if file not found
+	 */
 	public function test_getManifest_throws_if_file_not_found() {
 		$this->expectException( '\LogicException' );
 		$enqueue = new \WPackio\Enqueue( 'foo', 'dist', '1.0.0', 'plugin', $this->pp );
 		$enqueue->getManifest( 'noop' );
 	}
 
+	/**
+	 * @testdox `getManifest` throws if file not valid JSON
+	 */
 	public function test_getManifest_throws_if_file_not_valid() {
 		$this->expectException( '\LogicException' );
 		$enqueue = new \WPackio\Enqueue( 'foo', 'dist', '1.0.0', 'plugin', $this->pp );
 		$enqueue->getManifest( 'broken' );
 	}
 
+	/**
+	 * @testdox `getAssets` throws on invalid entrypoint
+	 */
 	public function test_getAssets_throws_on_invalid_entrypoint() {
 		$this->expectException('\LogicException');
-		$enqueue = new \WPackio\Enqueue( 'foo', 'dist', '1.0.0', 'theme' );
+		$enqueue = new \WPackio\Enqueue( 'foo', 'dist', '1.0.0', 'theme', false, 'regular' );
 		$enqueue->getAssets( 'app', 'noop', [] );
 	}
 
-	public function test_getAssets_for_theme() {
-		$enqueue = new \WPackio\Enqueue( 'foo', 'dist', '1.0.0', 'theme' );
+	/**
+	 * @testdox `getAssets` works for regular themes
+	 */
+	public function test_getAssets_for_regular_theme() {
+		$enqueue = new \WPackio\Enqueue( 'foo', 'dist', '1.0.0', 'theme', false, 'regular' );
 		$assets = $enqueue->getAssets( 'app', 'main', [
 			'js' => true,
 			'css' => true,
@@ -128,7 +195,7 @@ class EnqueueTest extends TestCase {
 		foreach ( $assets['js']  as $js ) {
 			$this->assertArrayHasKey( 'url', $js );
 			$this->assertArrayHasKey( 'handle', $js );
-			$this->assertContains( $this->tdu . '/dist/app/', $js['url'] );
+			$this->assertContains( $this->templateDirectoryUri . '/dist/app/', $js['url'] );
 		}
 
 
@@ -137,12 +204,49 @@ class EnqueueTest extends TestCase {
 		foreach ( $assets['css']  as $css ) {
 			$this->assertArrayHasKey( 'url', $css );
 			$this->assertArrayHasKey( 'handle', $css );
-			$this->assertContains( $this->tdu . '/dist/app/', $css['url'] );
+			$this->assertContains( $this->templateDirectoryUri . '/dist/app/', $css['url'] );
 		}
 
 		$this->assertMatchesSnapshot( $assets );
 	}
 
+	/**
+	 * @testdox `getAssets` works for child themes
+	 */
+	public function test_getAssets_for_child_theme() {
+		$enqueue = new \WPackio\Enqueue( 'foo', 'dist', '1.0.0', 'theme', false, 'child' );
+		$assets = $enqueue->getAssets( 'app', 'main', [
+			'js' => true,
+			'css' => true,
+			'js_dep' => [],
+			'css_dep' => [],
+			'identifier' => false,
+			'in_footer' => true,
+			'media' => 'all',
+		] );
+		// expect on js
+		$this->assertArrayHasKey( 'js', $assets );
+		foreach ( $assets['js']  as $js ) {
+			$this->assertArrayHasKey( 'url', $js );
+			$this->assertArrayHasKey( 'handle', $js );
+			$this->assertContains( $this->stylesheetDirectoryUri . '/dist/app/', $js['url'] );
+		}
+
+
+		// expect on js
+		$this->assertArrayHasKey( 'css', $assets );
+		foreach ( $assets['css']  as $css ) {
+			$this->assertArrayHasKey( 'url', $css );
+			$this->assertArrayHasKey( 'handle', $css );
+			$this->assertContains( $this->stylesheetDirectoryUri . '/dist/app/', $css['url'] );
+		}
+
+		$this->assertMatchesSnapshot( $assets );
+	}
+
+	/**
+	 * @testdox `getAssets` works for plugins
+	 */
 	public function test_getAssets_for_plugin() {
 		$enqueue = new \WPackio\Enqueue( 'foo', 'dist', '1.0.0', 'plugin', $this->pp );
 		$assets = $enqueue->getAssets( 'app', 'main', [
@@ -173,6 +277,9 @@ class EnqueueTest extends TestCase {
 		$this->assertMatchesSnapshot( $assets );
 	}
 
+	/**
+	 * @testdox `getAssets` has same handle for every runtime asset
+	 */
 	public function test_getAssets_has_same_handle_for_every_runtime() {
 		$runtime_handles = [];
 		$enqueue = new \WPackio\Enqueue( 'foo', 'dist', '1.0.0', 'plugin', $this->pp );
@@ -212,7 +319,9 @@ class EnqueueTest extends TestCase {
 		);
 	}
 
-
+	/**
+	 * @testdox `register` calls proper WordPress APIs
+	 */
 	public function test_register() {
 		// Get the manifest beforehand for assertion
 		$path_to_manifest = dirname( $this->pp ) . '/dist/app/manifest.json';
@@ -255,6 +364,9 @@ class EnqueueTest extends TestCase {
 		$this->assertMatchesSnapshot( $enqueue_assets );
 	}
 
+	/**
+	 * @testdox `enqueue` calls proper WordPress APIs
+	 */
 	public function test_enqueue() {
 		// Arrange
 		$config = [
@@ -312,6 +424,9 @@ class EnqueueTest extends TestCase {
 		$enqueue->enqueue( 'app', 'main', $config );
 	}
 
+	/**
+	 * @testdox `getHandle` throws exception on invalid type
+	 */
 	public function test_getHandle_throws_exception() {
 		$this->expectException( '\LogicException' );
 		$enqueue = new \WPackio\Enqueue( 'foo', 'dist', '1.0.0', 'plugin', $this->pp );
