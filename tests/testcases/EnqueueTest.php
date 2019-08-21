@@ -61,6 +61,12 @@ class EnqueueTest extends TestCase {
 			'wp_parse_args',
 			'sanitize_title_with_dashes'
 		]);
+		// Stub some other function
+		\Brain\Monkey\Functions\stubs( [
+			'sanitize_key' => function ( $key ) {
+				return preg_replace( '/[^a-z0-9_\-]/', '', strtolower( $key ) );
+			}
+		] );
 	}
 
 	/**
@@ -112,6 +118,17 @@ class EnqueueTest extends TestCase {
 		$enqueue->printPublicPath();
 		$result = ob_get_clean();
 		$this->assertContains( 'window.__wpackIofoodist=\'' . $this->stylesheetDirectoryUri . '/dist/\'', $result );
+	}
+
+	/**
+	 * @testdox `printPublicPath` works with sub-folders in outputPath
+	 */
+	public function test_printPublicPath_with_subfolders() {
+		$enqueue = new \WPackio\Enqueue( 'foo', 'assets/dist', '1.0.0', 'theme', false, 'regular' );
+		ob_start();
+		$enqueue->printPublicPath();
+		$result = ob_get_clean();
+		$this->assertContains( 'window.__wpackIofooassetsdist=\'' . $this->templateDirectoryUri . '/assets/dist/\'', $result );
 	}
 
 	/**
