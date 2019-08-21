@@ -133,7 +133,7 @@ class Enqueue {
 	 */
 	public function printPublicPath() {
 		$publicPath = $this->getUrl( '' );
-		$jsCode = 'window.__wpackIo' . sanitize_key($this->appName . $this->outputPath) . '=\'' . esc_js( $publicPath ) . '\';';
+		$jsCode = 'window.__wpackIo' . sanitize_key( $this->appName . $this->outputPath ) . '=\'' . esc_js( $publicPath ) . '\';';
 		echo '<script type="text/javascript">/* wpack.io publicPath */' . $jsCode . '</script>';
 	}
 
