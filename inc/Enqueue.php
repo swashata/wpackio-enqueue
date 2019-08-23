@@ -129,8 +129,7 @@ class Enqueue {
 	 * @return string
 	 */
 	private function sanitize_path( $path ) {
-		$path = strtolower( $path );
-		return preg_replace( '/[^a-z0-9_\-]/', '', $path );
+		return preg_replace( '/[^a-z0-9_\-]/i', '', $path );
 	}
 
 	/**

@@ -118,11 +118,11 @@ class EnqueueTest extends TestCase {
 	 * @testdox `printPublicPath` works with sub-folders in outputPath
 	 */
 	public function test_printPublicPath_with_subfolders() {
-		$enqueue = new \WPackio\Enqueue( 'foo', 'assets/dist', '1.0.0', 'theme', false, 'regular' );
+		$enqueue = new \WPackio\Enqueue( 'foo', 'assets/Dist', '1.0.0', 'theme', false, 'regular' );
 		ob_start();
 		$enqueue->printPublicPath();
 		$result = ob_get_clean();
-		$this->assertContains( 'window.__wpackIofooassetsdist=\'' . $this->templateDirectoryUri . '/assets/dist/\'', $result );
+		$this->assertContains( 'window.__wpackIofooassetsDist=\'' . $this->templateDirectoryUri . '/assets/Dist/\'', $result );
 	}
 
 	/**
