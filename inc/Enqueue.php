@@ -124,7 +124,7 @@ class Enqueue {
 	/**
 	 * Sanitizes a string key.
 	 *
-	 * @param string $path The path to be sanitized
+	 * @param string $path The path to be sanitized.
 	 *
 	 * @return string
 	 */
