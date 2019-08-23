@@ -61,12 +61,6 @@ class EnqueueTest extends TestCase {
 			'wp_parse_args',
 			'sanitize_title_with_dashes'
 		]);
-		// Stub some other function
-		\Brain\Monkey\Functions\stubs( [
-			'sanitize_key' => function ( $key ) {
-				return preg_replace( '/[^a-z0-9_\-]/', '', strtolower( $key ) );
-			}
-		] );
 	}
 
 	/**

@@ -122,6 +122,18 @@ class Enqueue {
 	}
 
 	/**
+	 * Sanitizes a string key.
+	 *
+	 * @param string $path The path to be sanitized
+	 *
+	 * @return string
+	 */
+	private function sanitize_path( $path ) {
+		$path = strtolower( $path );
+		return preg_replace( '/[^a-z0-9_\-]/', '', $path );
+	}
+
+	/**
 	 * Print a small JavaScript code to defined WordPress generated publicPath
 	 * for this theme or plugin.
 	 *
@@ -133,7 +145,7 @@ class Enqueue {
 	 */
 	public function printPublicPath() {
 		$publicPath = $this->getUrl( '' );
-		$jsCode = 'window.__wpackIo' . sanitize_key( $this->appName . $this->outputPath ) . '=\'' . esc_js( $publicPath ) . '\';';
+		$jsCode = 'window.__wpackIo' . $this->sanitize_path( $this->appName . $this->outputPath ) . '=\'' . esc_js( $publicPath ) . '\';';
 		echo '<script type="text/javascript">/* wpack.io publicPath */' . $jsCode . '</script>';
 	}
 
