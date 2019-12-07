@@ -6,12 +6,15 @@
 		<exclude name="WordPress.Files.FileName.NotHyphenatedLowercase"/>
 		<exclude name="WordPress.Arrays.MultipleStatementAlignment.DoubleArrowNotAligned"/>
 		<exclude name="Generic.Formatting.MultipleStatementAlignment.NotSameWarning"/>
-		<exclude name="WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar"/>
-		<exclude name="WordPress.NamingConventions.ValidVariableName.NotSnakeCase"/>
+		<exclude name="WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase"/>
+		<exclude name="WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase"/>
 		<exclude name="WordPress.NamingConventions.ValidFunctionName.MethodNameInvalid"/>
-		<exclude name="WordPress.NamingConventions.ValidVariableName.MemberNotSnakeCase"/>
+		<exclude name="WordPress.NamingConventions.ValidVariableName.PropertyNotSnakeCase"/>
 		<exclude name="WordPress.PHP.YodaConditions"/>
+		<exclude name="Generic.Arrays.DisallowShortArraySyntax"/>
 	</rule>
+
+	<rule ref="Generic.Arrays.DisallowLongArraySyntax"/>
 
 	<rule ref="WordPress.WP.I18n">
 		<properties>
@@ -51,10 +54,10 @@
 	<file>.</file>
 
 	<!-- Show sniff codes in all reports -->
-	<arg value="s"/>
+	<arg value="ps"/>
 
 	<!-- PHPCompatibility -->
-	<config name="testVersion" value="5.6-7.2"/>
+	<config name="testVersion" value="5.6-"/>
 	<rule ref="PHPCompatibility"/>
 
 	<exclude-pattern>*/node_modules/*</exclude-pattern>
