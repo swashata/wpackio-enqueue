@@ -91,7 +91,7 @@ class Enqueue {
 		$this->appName = $appName;
 		$this->outputPath = $outputPath;
 		$this->version = $version;
-		if ( ! in_array( $type, [ 'plugin', 'theme' ] ) ) {
+		if ( ! in_array( $type, [ 'plugin', 'theme' ], true ) ) {
 			throw new \LogicException( 'You can only enter "plugin" or "theme" as type.' );
 		}
 		$this->type = $type;
@@ -258,7 +258,7 @@ class Enqueue {
 	 * @return string Unique handle for this asset.
 	 */
 	public function getHandle( $name, $path, $type = 'script' ) {
-		if ( ! \in_array( $type, [ 'script', 'style' ] ) ) {
+		if ( ! \in_array( $type, [ 'script', 'style' ], true ) ) {
 			throw new \LogicException( 'Type has to be either script or style.' );
 		}
 		return 'wpackio_'
