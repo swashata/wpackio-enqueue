@@ -45,7 +45,7 @@ class Enqueue {
 	 *
 	 * @var array
 	 */
-	static private $manifestCache = [];
+	private $manifestCache = [];
 
 	/**
 	 * Root absolute path to the output directory. With forward slash.
@@ -383,8 +383,8 @@ class Enqueue {
 	 */
 	public function getManifest( $dir ) {
 		// If already present in the cache, then return it
-		if ( isset( self::$manifestCache[ $this->outputPath ][ $dir ] ) ) {
-			return self::$manifestCache[ $this->outputPath ][ $dir ];
+		if ( isset( $this->manifestCache[ $this->outputPath ][ $dir ] ) ) {
+			return $this->manifestCache[ $this->outputPath ][ $dir ];
 		}
 		// It is not, so get the json file
 		$filepath = $this->rootPath . $dir . '/manifest.json';
@@ -397,10 +397,10 @@ class Enqueue {
 		if ( $manifest === null || ! isset( $manifest['wpackioEp'] ) ) {
 			throw new \LogicException( sprintf( 'Invalid manifest file at %s. Either it is not valid JSON or wpackioEp does not exist.', $filepath ) );
 		}
-		if ( ! isset( self::$manifestCache[ $this->outputPath ] ) ) {
-			self::$manifestCache[ $this->outputPath ] = [];
+		if ( ! isset( $this->manifestCache[ $this->outputPath ] ) ) {
+			$this->manifestCache[ $this->outputPath ] = [];
 		}
-		self::$manifestCache[ $this->outputPath ][ $dir ] = $manifest;
-		return self::$manifestCache[ $this->outputPath ][ $dir ];
+		$this->manifestCache[ $this->outputPath ][ $dir ] = $manifest;
+		return $this->manifestCache[ $this->outputPath ][ $dir ];
 	}
 }
