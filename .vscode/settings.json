@@ -1,5 +1,5 @@
 {
-  "phpcs.enable": true,
+  "phpSniffer.autoDetect": true,
   "spellright.language": [
     "en"
   ],
