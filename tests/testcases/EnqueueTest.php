@@ -69,8 +69,8 @@ class EnqueueTest extends TestCase {
 	public function test_construct() {
 		$enqueue = new \WPackio\Enqueue( 'foo', 'dist', '1.0.0', 'plugin', '/plugin/path/plugin.php' );
 		// We expect hooks on both wp_head and admin_head
-		$this->assertTrue( has_action( 'wp_head', 'WPackio\\Enqueue->printPublicPath()', -1000 ) );
-		$this->assertTrue( has_action( 'admin_print_scripts', 'WPackio\\Enqueue->printPublicPath()', -1000 ) );
+		$this->assertEquals( has_action( 'wp_head', 'WPackio\\Enqueue->printPublicPath()', -1000 ), -1000 );
+		$this->assertEquals( has_action( 'admin_print_scripts', 'WPackio\\Enqueue->printPublicPath()', -1000 ), -1000 );
 	}
 
 	/**
