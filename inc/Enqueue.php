@@ -394,7 +394,7 @@ class Enqueue {
 			. $name
 			. '/'
 			. $entryPoint
-			. 'dependencies.wp.json';
+			. '.dependencies.wp.json';
 		if ( ! \file_exists( $filepath ) ) {
 			return [];
 		}
