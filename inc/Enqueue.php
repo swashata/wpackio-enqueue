@@ -168,13 +168,14 @@ class Enqueue {
 		$config = $this->normalizeAssetConfig( $config );
 		// Get asset urls
 		$assets = $this->getAssets( $name, $entryPoint, $config );
+
 		// Enqueue all js
 		$jses = $assets['js'];
 		$csses = $assets['css'];
 
 		// Hold a flag to calculate dependencies
-		$js_deps = [];
-		$css_deps = [];
+		$jsDeps = $this->getJsBuildDependencies( $name, $entryPoint );
+		$cssDeps = [];
 
 		// Register javascript files
 		if ( $config['js'] ) {
@@ -182,12 +183,12 @@ class Enqueue {
 				\wp_register_script(
 					$js['handle'],
 					$js['url'],
-					array_merge( $config['js_dep'], $js_deps ),
+					array_merge( $config['js_dep'], $jsDeps ),
 					$this->version,
 					$config['in_footer']
 				);
 				// The next one depends on this one
-				$js_deps[] = $js['handle'];
+				$jsDeps[] = $js['handle'];
 			}
 		}
 
@@ -197,12 +198,12 @@ class Enqueue {
 				\wp_register_style(
 					$css['handle'],
 					$css['url'],
-					array_merge( $config['css_dep'], $css_deps ),
+					array_merge( $config['css_dep'], $cssDeps ),
 					$this->version,
 					$config['media']
 				);
 				// The next one depends on this one
-				$css_deps[] = $css['handle'];
+				$cssDeps[] = $css['handle'];
 			}
 		}
 
@@ -294,7 +295,14 @@ class Enqueue {
 		if ( ! isset( $manifest['wpackioEp'][ $entryPoint ] ) ) {
 			throw new \LogicException( 'No entry point found in the manifest' );
 		}
-		$enqueue = $manifest['wpackioEp'][ $entryPoint ];
+		$enqueue =
+			isset( $manifest['wpackioEp'][ $entryPoint ]['assets'] )
+				? $manifest['wpackioEp'][ $entryPoint ]['assets']
+				: false;
+
+		if ( $enqueue === false ) {
+			throw new \LogicException( 'No assets found in the entry point. Make sure you are using @wpackio/scripts version 6+.' );
+		}
 
 		$js_handles = [];
 		$css_handles = [];
@@ -371,6 +379,30 @@ class Enqueue {
 	 */
 	public function getUrl( $asset ) {
 		return $this->rootUrl . $asset;
+	}
+
+	/**
+	 * Given an entry name and a entrypoint, get back its JavaScript dependencies
+	 * as generated from wpackio scripts.
+	 *
+	 * @param string $name The name of the files entry.
+	 * @param string $entryPoint Which entrypoint would you like to get for.
+	 * @return array array of registered handles.
+	 */
+	public function getJsBuildDependencies( $name, $entryPoint ) {
+		$filepath = $this->rootPath
+			. $name
+			. '/'
+			. $entryPoint
+			. 'dependencies.wp.json';
+		if ( ! \file_exists( $filepath ) ) {
+			return [];
+		}
+		$deps = json_decode( file_get_contents( $filepath ), true );
+		if ( $deps !== null && isset( $deps['dependencies'] ) ) {
+			return $deps['dependencies'];
+		}
+		return [];
 	}
 
 	/**
