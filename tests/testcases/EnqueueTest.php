@@ -463,4 +463,37 @@ class EnqueueTest extends TestCase {
 		$enqueue = new \WPackio\Enqueue( 'foo', 'dist', '1.0.0', 'plugin', $this->pp );
 		$enqueue->getHandle( 'foo', 'bar', 'baz' );
 	}
+
+	/**
+	 * @testdox `getPrimaryJsHandle` returns the proper handle for proper assets
+	 */
+	public function test_getPrimaryJsHandle_returns_the_proper_handle_for_proper_assets() {
+		// Prepare
+		$enqueue = new \WPackio\Enqueue( 'foo', 'dist', '1.0.0', 'plugin', $this->pp );
+		\Brain\Monkey\Functions\expect( 'wp_register_script' )
+				->atLeast()
+				->once();
+
+		\Brain\Monkey\Functions\expect( 'wp_register_style' )
+				->atLeast()
+				->once();
+
+		$assets = $enqueue->register( 'app', 'main', [
+			'js' => true,
+			'css' => true,
+			'js_dep' => [],
+			'css_dep' => [],
+			'in_footer' => true,
+			'media' => 'all',
+		] );
+		$handle = $enqueue->getPrimaryJsHandle( $assets );
+		$this->assertSame( 'wpackio_fooapp_app__main_js_script', $handle );
+
+		// also test the failures
+		$this->assertFalse( $enqueue->getPrimaryJsHandle( [] ) );
+		$this->assertFalse( $enqueue->getPrimaryJsHandle( 'foo' ) );
+		$this->assertFalse( $enqueue->getPrimaryJsHandle( [ 'js' => 'foo' ] ) );
+		$this->assertFalse( $enqueue->getPrimaryJsHandle( [ 'js' => [] ] ) );
+		$this->assertFalse( $enqueue->getPrimaryJsHandle( [ 'js' => [ 'bla' ] ] ) );
+	}
 }

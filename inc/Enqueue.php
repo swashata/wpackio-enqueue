@@ -262,13 +262,18 @@ class Enqueue {
 		if ( ! \in_array( $type, [ 'script', 'style' ], true ) ) {
 			throw new \LogicException( 'Type has to be either script or style.' );
 		}
-		return 'wpackio_'
+		$handle = 'wpackio_'
 			. $this->appName
 			. $name
 			. '_'
 			. $path
 			. '_'
 			. $type;
+		return \str_replace(
+			[ '\\', '/', '.' ],
+			[ '__', '__', '_' ],
+			$handle
+		);
 	}
 
 	/**
@@ -434,5 +439,28 @@ class Enqueue {
 		}
 		$this->manifestCache[ $this->outputPath ][ $dir ] = $manifest;
 		return $this->manifestCache[ $this->outputPath ][ $dir ];
+	}
+
+	/**
+	 * Get primary js handle from enqueued/registered assets.
+	 *
+	 * This is useful to localize/translate the script handle.
+	 *
+	 * @param mixed $assets Assets array as returned from enqueue or register.
+	 * @return string|false string if handle was found, false otherwise.
+	 */
+	public function getPrimaryJsHandle( $assets ) {
+		if (
+			! \is_array( $assets )
+			|| ! isset( $assets['js'] )
+			|| ! \is_array( $assets['js'] )
+		) {
+			return false;
+		}
+		$lastJsAsset = array_pop( $assets['js'] );
+		if ( ! $lastJsAsset || ! isset( $lastJsAsset['handle'] ) ) {
+			return false;
+		}
+		return $lastJsAsset['handle'];
 	}
 }
