@@ -8,26 +8,30 @@
   "mobile.js.map": "app/mobile.js.map",
   "blablabla": {
     "main": {
-      "css": [
-        "app/main.css"
-      ],
-      "js": [
-        "app/main.js"
-      ],
-      "css.map": [
-        "app/main.css.map"
-      ],
-      "js.map": [
-        "app/main.js.map"
-      ]
+      "assets": {
+        "css": [
+          "app/main.css"
+        ],
+        "js": [
+          "app/main.js"
+        ],
+        "css.map": [
+          "app/main.css.map"
+        ],
+        "js.map": [
+          "app/main.js.map"
+        ]
+      }
     },
     "mobile": {
-      "js": [
-        "app/mobile.js"
-      ],
-      "js.map": [
-        "app/mobile.js.map"
-      ]
+      "assets": {
+        "js": [
+          "app/mobile.js"
+        ],
+        "js.map": [
+          "app/mobile.js.map"
+        ]
+      }
     }
   }
 }

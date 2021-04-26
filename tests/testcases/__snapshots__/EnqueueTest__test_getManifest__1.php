@@ -12,40 +12,46 @@
   array (
     'main' => 
     array (
-      'js' => 
+      'assets' => 
       array (
-        0 => 'app/runtime.js',
-        1 => 'app/vendor.js',
-        2 => 'app/main.js',
-      ),
-      'js.map' => 
-      array (
-        0 => 'app/runtime.js.map',
-        1 => 'app/vendor.js.map',
-        2 => 'app/main.js.map',
-      ),
-      'css' => 
-      array (
-        0 => 'app/main.css',
-      ),
-      'css.map' => 
-      array (
-        0 => 'app/main.css.map',
+        'js' => 
+        array (
+          0 => 'app/runtime.js',
+          1 => 'app/vendor.js',
+          2 => 'app/main.js',
+        ),
+        'js.map' => 
+        array (
+          0 => 'app/runtime.js.map',
+          1 => 'app/vendor.js.map',
+          2 => 'app/main.js.map',
+        ),
+        'css' => 
+        array (
+          0 => 'app/main.css',
+        ),
+        'css.map' => 
+        array (
+          0 => 'app/main.css.map',
+        ),
       ),
     ),
     'mobile' => 
     array (
-      'js' => 
+      'assets' => 
       array (
-        0 => 'app/runtime.js',
-        1 => 'app/vendor.js',
-        2 => 'app/mobile.js',
-      ),
-      'js.map' => 
-      array (
-        0 => 'app/runtime.js.map',
-        1 => 'app/vendor.js.map',
-        2 => 'app/mobile.js.map',
+        'js' => 
+        array (
+          0 => 'app/runtime.js',
+          1 => 'app/vendor.js',
+          2 => 'app/mobile.js',
+        ),
+        'js.map' => 
+        array (
+          0 => 'app/runtime.js.map',
+          1 => 'app/vendor.js.map',
+          2 => 'app/mobile.js.map',
+        ),
       ),
     ),
   ),

@@ -365,7 +365,7 @@ class EnqueueTest extends TestCase {
 		$js_deps = [];
 		$css_deps = [];
 
-		foreach ( $manifest['wpackioEp']['main']['js'] as $js_path ) {
+		foreach ( $manifest['wpackioEp']['main']['assets']['js'] as $js_path ) {
 			$js_handle = $enqueue->getHandle( 'app', $js_path, 'script' );
 			\Brain\Monkey\Functions\expect( 'wp_register_script' )
 				->once()
@@ -373,7 +373,7 @@ class EnqueueTest extends TestCase {
 			$js_deps[] = $js_handle;
 		}
 		// Loop over all css and make sure wp_register_style is called
-		foreach ( $manifest['wpackioEp']['main']['css'] as $css_path ) {
+		foreach ( $manifest['wpackioEp']['main']['assets']['css'] as $css_path ) {
 			$css_handle = $enqueue->getHandle( 'app', $css_path, 'style' );
 			\Brain\Monkey\Functions\expect( 'wp_register_style' )
 				->once()
