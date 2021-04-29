@@ -442,6 +442,28 @@ class Enqueue {
 	}
 
 	/**
+	 * Get primary handle from enqueued/registered assets.
+	 *
+	 * @param array  $assets Assets array as returned from enqueue or register.
+	 * @param string $type Type of asset, either `js` or `css`.
+	 * @return string|false string if handle was found, false otherwise.
+	 */
+	public function getPrimaryHandle( $assets, $type = 'js' ) {
+		if (
+			! \is_array( $assets )
+			|| ! isset( $assets[ $type ] )
+			|| ! \is_array( $assets[ $type ] )
+		) {
+			return false;
+		}
+		$lastJsAsset = array_pop( $assets[ $type ] );
+		if ( ! $lastJsAsset || ! isset( $lastJsAsset['handle'] ) ) {
+			return false;
+		}
+		return $lastJsAsset['handle'];
+	}
+
+	/**
 	 * Get primary js handle from enqueued/registered assets.
 	 *
 	 * This is useful to localize/translate the script handle.
@@ -450,17 +472,18 @@ class Enqueue {
 	 * @return string|false string if handle was found, false otherwise.
 	 */
 	public function getPrimaryJsHandle( $assets ) {
-		if (
-			! \is_array( $assets )
-			|| ! isset( $assets['js'] )
-			|| ! \is_array( $assets['js'] )
-		) {
-			return false;
-		}
-		$lastJsAsset = array_pop( $assets['js'] );
-		if ( ! $lastJsAsset || ! isset( $lastJsAsset['handle'] ) ) {
-			return false;
-		}
-		return $lastJsAsset['handle'];
+		return $this->getPrimaryHandle( $assets, 'js' );
+	}
+
+	/**
+	 * Get primary css handle from enqueued/registered assets.
+	 *
+	 * This is useful to localize/translate the script handle.
+	 *
+	 * @param mixed $assets Assets array as returned from enqueue or register.
+	 * @return string|false string if handle was found, false otherwise.
+	 */
+	public function getPrimaryCssHandle( $assets ) {
+		return $this->getPrimaryHandle( $assets, 'css' );
 	}
 }
