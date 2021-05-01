@@ -7,6 +7,14 @@
 
 namespace WPackioTest;
 
+use WPackio\Enqueue;
+use UnexpectedValueException;
+use Brain\Monkey\Expectation\Exception\Exception;
+use Brain\Monkey\Expectation\Exception\MissedPatchworkReplace;
+use LogicException;
+use PHPUnit\Framework\ExpectationFailedException;
+use SebastianBergmann\RecursionContext\InvalidArgumentException;
+
 class EnqueueTest extends TestCase {
 	/**
 	 * Mocked Template Directory Uri
@@ -452,6 +460,7 @@ class EnqueueTest extends TestCase {
 		}
 
 		// Act
+		/** @var Enqueue $enqueue */
 		$enqueue->enqueue( 'app', 'main', $config );
 	}
 
@@ -465,9 +474,11 @@ class EnqueueTest extends TestCase {
 	}
 
 	/**
-	 * @testdox `getPrimaryJsHandle` returns the proper handle for proper assets
+	 * Prepare enqueue and assets.
+	 *
+	 * @return (Enqueue|array)[] Touple of Enqueue and assets.
 	 */
-	public function test_getPrimaryJsHandle_returns_the_proper_handle_for_proper_assets() {
+	protected function prepare_enqueue_assets() {
 		// Prepare
 		$enqueue = new \WPackio\Enqueue( 'foo', 'dist', '1.0.0', 'plugin', $this->pp );
 		\Brain\Monkey\Functions\expect( 'wp_register_script' )
@@ -486,6 +497,16 @@ class EnqueueTest extends TestCase {
 			'in_footer' => true,
 			'media' => 'all',
 		] );
+		return [ $enqueue, $assets ];
+	}
+
+	/**
+	 * @testdox `getPrimaryJsHandle` returns the proper handle for proper assets
+	 */
+	public function test_getPrimaryJsHandle_returns_the_proper_handle_for_proper_assets() {
+		// Prepare
+		[ $enqueue, $assets ] = $this->prepare_enqueue_assets();
+
 		$handle = $enqueue->getPrimaryJsHandle( $assets );
 		$this->assertSame( 'wpackio_fooapp_app__main_js_script', $handle );
 
@@ -502,23 +523,8 @@ class EnqueueTest extends TestCase {
 	 */
 	public function test_getPrimaryCssHandle_returns_the_proper_handle_for_proper_assets() {
 		// Prepare
-		$enqueue = new \WPackio\Enqueue( 'foo', 'dist', '1.0.0', 'plugin', $this->pp );
-		\Brain\Monkey\Functions\expect( 'wp_register_script' )
-				->atLeast()
-				->once();
+		[ $enqueue, $assets ] = $this->prepare_enqueue_assets();
 
-		\Brain\Monkey\Functions\expect( 'wp_register_style' )
-				->atLeast()
-				->once();
-
-		$assets = $enqueue->register( 'app', 'main', [
-			'js' => true,
-			'css' => true,
-			'js_dep' => [],
-			'css_dep' => [],
-			'in_footer' => true,
-			'media' => 'all',
-		] );
 		$handle = $enqueue->getPrimaryCssHandle( $assets );
 		$this->assertSame( 'wpackio_fooapp_app__main_css_style', $handle );
 
@@ -528,5 +534,51 @@ class EnqueueTest extends TestCase {
 		$this->assertFalse( $enqueue->getPrimaryCssHandle( [ 'js' => 'foo' ] ) );
 		$this->assertFalse( $enqueue->getPrimaryCssHandle( [ 'js' => [] ] ) );
 		$this->assertFalse( $enqueue->getPrimaryCssHandle( [ 'js' => [ 'bla' ] ] ) );
+	}
+
+	/**
+	 * @testdox `getCssHandles` works for proper assets
+	 */
+	public function test_getCssHandles_works_for_proper_assets() {
+		// Prepare
+		[ $enqueue, $assets ] = $this->prepare_enqueue_assets();
+
+		$css_handles = $enqueue->getCssHandles( $assets );
+		$this->assertEquals(
+			[ 'wpackio_fooapp_app__main_css_style' ],
+			$css_handles
+		);
+
+		$this->assertCount( 0, $enqueue->getCssHandles( false ) );
+		$this->assertCount( 0, $enqueue->getCssHandles( [] ) );
+		$this->assertCount( 0, $enqueue->getCssHandles( 'foo' ) );
+		$this->assertCount( 0, $enqueue->getCssHandles( [ 'js' => 'foo' ] ) );
+		$this->assertCount( 0, $enqueue->getCssHandles( [ 'js' => [] ] ) );
+		$this->assertCount( 0, $enqueue->getCssHandles( [ 'js' => [ 'bla' ] ] ) );
+	}
+
+	/**
+	 * @testdox `getJsHandles` works for proper assets
+	 */
+	public function test_getJsHandles_works_for_proper_assets() {
+		// Prepare
+		[ $enqueue, $assets ] = $this->prepare_enqueue_assets();
+
+		$css_handles = $enqueue->getJsHandles( $assets );
+		$this->assertEquals(
+			[
+				'wpackio_fooapp_app__runtime_js_script',
+				'wpackio_fooapp_app__vendor_js_script',
+				'wpackio_fooapp_app__main_js_script',
+			],
+			$css_handles
+		);
+
+		$this->assertCount( 0, $enqueue->getJsHandles( false ) );
+		$this->assertCount( 0, $enqueue->getJsHandles( [] ) );
+		$this->assertCount( 0, $enqueue->getJsHandles( 'foo' ) );
+		$this->assertCount( 0, $enqueue->getJsHandles( [ 'css' => 'foo' ] ) );
+		$this->assertCount( 0, $enqueue->getJsHandles( [ 'css' => [] ] ) );
+		$this->assertCount( 0, $enqueue->getJsHandles( [ 'css' => [ 'bla' ] ] ) );
 	}
 }

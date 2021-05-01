@@ -486,4 +486,45 @@ class Enqueue {
 	public function getPrimaryCssHandle( $assets ) {
 		return $this->getPrimaryHandle( $assets, 'css' );
 	}
+
+	/**
+	 * Get handles of a particular type from enqueued/registered assets.
+	 *
+	 * @param mixed  $assets Assets array as returned from enqueue or register.
+	 * @param string $type Type of asset, either `js` or `css`.
+	 * @return array Array of handles. Would return an empty handle if not found.
+	 */
+	public function getHandles( $assets, $type = 'js' ) {
+		$handles = [];
+		if (
+			\is_array( $assets )
+			&& isset( $assets[ $type ] )
+			&& \count( $assets[ $type ] )
+		) {
+			foreach ( $assets[ $type ] as $asset ) {
+				$handles[] = $asset['handle'];
+			}
+		}
+		return $handles;
+	}
+
+	/**
+	 * Get all css handles from enqueued/registered assets.
+	 *
+	 * @param mixed $assets Assets array as returned from enqueue or register.
+	 * @return array Array of css handles. Would return an empty handle if not found.
+	 */
+	public function getCssHandles( $assets ) {
+		return $this->getHandles( $assets, 'css' );
+	}
+
+	/**
+	 * Get all js handles from enqueued/registered assets.
+	 *
+	 * @param mixed $assets Assets array as returned from enqueue or register.
+	 * @return array Array of js handles. Would return an empty handle if not found.
+	 */
+	public function getJsHandles( $assets ) {
+		return $this->getHandles( $assets, 'js' );
+	}
 }
