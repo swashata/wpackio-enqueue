@@ -508,7 +508,7 @@ class EnqueueTest extends TestCase {
 		[ $enqueue, $assets ] = $this->prepare_enqueue_assets();
 
 		$handle = $enqueue->getPrimaryJsHandle( $assets );
-		$this->assertSame( 'wpackio_fooapp_app__main_js_script', $handle );
+		$this->assertSame( 'wpackio_fooapp_app_main_js_script', $handle );
 
 		// also test the failures
 		$this->assertFalse( $enqueue->getPrimaryJsHandle( [] ) );
@@ -526,7 +526,7 @@ class EnqueueTest extends TestCase {
 		[ $enqueue, $assets ] = $this->prepare_enqueue_assets();
 
 		$handle = $enqueue->getPrimaryCssHandle( $assets );
-		$this->assertSame( 'wpackio_fooapp_app__main_css_style', $handle );
+		$this->assertSame( 'wpackio_fooapp_app_main_css_style', $handle );
 
 		// also test the failures
 		$this->assertFalse( $enqueue->getPrimaryCssHandle( [] ) );
@@ -545,7 +545,7 @@ class EnqueueTest extends TestCase {
 
 		$css_handles = $enqueue->getCssHandles( $assets );
 		$this->assertEquals(
-			[ 'wpackio_fooapp_app__main_css_style' ],
+			[ 'wpackio_fooapp_app_main_css_style' ],
 			$css_handles
 		);
 
@@ -567,9 +567,9 @@ class EnqueueTest extends TestCase {
 		$css_handles = $enqueue->getJsHandles( $assets );
 		$this->assertEquals(
 			[
-				'wpackio_fooapp_app__runtime_js_script',
-				'wpackio_fooapp_app__vendor_js_script',
-				'wpackio_fooapp_app__main_js_script',
+				'wpackio_fooapp_app_runtime_js_script',
+				'wpackio_fooapp_app_vendor_js_script',
+				'wpackio_fooapp_app_main_js_script',
 			],
 			$css_handles
 		);

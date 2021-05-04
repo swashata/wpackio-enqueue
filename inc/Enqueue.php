@@ -269,11 +269,7 @@ class Enqueue {
 			. $path
 			. '_'
 			. $type;
-		return \str_replace(
-			[ '\\', '/', '.' ],
-			[ '__', '__', '_' ],
-			$handle
-		);
+		return \preg_replace( '/[^a-z0-9]/i', '_', $handle );
 	}
 
 	/**
