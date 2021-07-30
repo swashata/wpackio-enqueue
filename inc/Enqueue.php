@@ -309,9 +309,18 @@ class Enqueue {
 		$css_handles = [];
 
 		// Figure out all javascript assets
-		if ( $config['js'] && isset( $enqueue['js'] ) && count( (array) $enqueue['js'] ) ) {
+		$total_js_assets = count( (array) $enqueue['js'] );
+		if ( $config['js'] && isset( $enqueue['js'] ) && $total_js_assets ) {
 			foreach ( $enqueue['js'] as $index => $js ) {
 				$handle = $this->getHandle( $name, $js, 'script' );
+				// override the last one's handle if needed
+				if (
+					$index === $total_js_assets - 1
+					&& isset( $config['main_js_handle'] )
+					&& ! empty( $config['main_js_handle'] )
+				) {
+					$handle = $config['main_js_handle'];
+				}
 				// If the js is runtime, then use an unique handle
 				// if ( $js === $dir . '/runtime.js' ) {
 				// $handle = 'wpackio_' . $this->appName . $dir . '_runtime';
@@ -368,6 +377,7 @@ class Enqueue {
 				'css_dep' => [],
 				'in_footer' => true,
 				'media' => 'all',
+				'main_js_handle' => null,
 			]
 		);
 	}

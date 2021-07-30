@@ -102,5 +102,22 @@ class MyPluginInit {
 new MyPluginInit();
 ```
 
+## Default configuration when calling `enqueue`
+
+```php
+[
+	'js' => true,
+	'css' => true,
+	'js_dep' => [],
+	'css_dep' => [],
+	'in_footer' => true,
+	'media' => 'all',
+	'main_js_handle' => null,
+];
+```
+
+`main_js_handle` is added in 3.3 and can predictably set the handle of primary
+JavaScript file. Useful for translations etc.
+
 For information on usage and API, please visit official documentation site
 [wpack.io](https://wpack.io).
