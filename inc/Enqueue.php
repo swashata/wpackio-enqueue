@@ -313,20 +313,26 @@ class Enqueue {
 		if ( $config['js'] && isset( $enqueue['js'] ) && $total_js_assets ) {
 			foreach ( $enqueue['js'] as $index => $js ) {
 				$handle = $this->getHandle( $name, $js, 'script' );
+				// override the runtime handle if needed
+				if (
+					! empty( $config['runtime_js_handle'] )
+					// runtime is always the first dependency
+					&& $index === 0
+					// and it must have the name "runtime" in it, per wpackio config
+					&& \strpos( $handle, 'runtime' ) !== false
+				) {
+					$handle = $config['runtime_js_handle'];
+				}
+
 				// override the last one's handle if needed
 				if (
-					$index === $total_js_assets - 1
-					&& isset( $config['main_js_handle'] )
-					&& ! empty( $config['main_js_handle'] )
+					! empty( $config['main_js_handle'] )
+					// the last item in the dependency is the main handle
+					&& $index === $total_js_assets - 1
 				) {
 					$handle = $config['main_js_handle'];
 				}
-				// If the js is runtime, then use an unique handle
-				// if ( $js === $dir . '/runtime.js' ) {
-				// $handle = 'wpackio_' . $this->appName . $dir . '_runtime';
-				// By making it unique, we rely on WordPress to only
-				// enqueue it once.
-				// }
+
 				$js_handles[] = [
 					'handle' => $handle,
 					'url' => $this->getUrl( $js ),
@@ -378,6 +384,7 @@ class Enqueue {
 				'in_footer' => true,
 				'media' => 'all',
 				'main_js_handle' => null,
+				'runtime_js_handle' => null,
 			]
 		);
 	}
@@ -479,6 +486,33 @@ class Enqueue {
 	 */
 	public function getPrimaryJsHandle( $assets ) {
 		return $this->getPrimaryHandle( $assets, 'js' );
+	}
+
+	/**
+	 * Get runtime js handle from enqueued/registered assets.
+	 *
+	 * This is useful to localize/translate dependent script handles in the
+	 * same files entry. By calling `wp_set_script_translations` on the runtime
+	 * you can collectively enqueue translate json for all the dependencies on
+	 * the entries.
+	 *
+	 * @param mixed $assets Assets array as returned from enqueue or register.
+	 * @return string|false string if handle was found, false otherwise.
+	 */
+	public function getRuntimeJsHandle( $assets ) {
+		if (
+			! \is_array( $assets )
+			|| ! isset( $assets[ 'js' ] )
+			|| ! \is_array( $assets[ 'js' ] )
+		) {
+			return false;
+		}
+		// runtime asset is the first one in the assets list
+		$runtimeAsset = $assets['js'][0];
+		if ( ! $runtimeAsset || ! isset( $runtimeAsset['handle'] ) ) {
+			return false;
+		}
+		return $runtimeAsset['handle'];
 	}
 
 	/**

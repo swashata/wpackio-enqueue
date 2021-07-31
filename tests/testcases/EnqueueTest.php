@@ -478,7 +478,7 @@ class EnqueueTest extends TestCase {
 	 *
 	 * @return (Enqueue|array)[] Touple of Enqueue and assets.
 	 */
-	protected function prepare_enqueue_assets( $main_handle = null ) {
+	protected function prepare_enqueue_assets( $main_handle = null, $runtime_handle = null ) {
 		// Prepare
 		$enqueue = new \WPackio\Enqueue( 'foo', 'dist', '1.0.0', 'plugin', $this->pp );
 		\Brain\Monkey\Functions\expect( 'wp_register_script' )
@@ -497,6 +497,7 @@ class EnqueueTest extends TestCase {
 			'in_footer' => true,
 			'media' => 'all',
 			'main_js_handle' => $main_handle,
+			'runtime_js_handle' => $runtime_handle,
 		] );
 		return [ $enqueue, $assets ];
 	}
@@ -593,4 +594,17 @@ class EnqueueTest extends TestCase {
 			$enqueue->getPrimaryJsHandle( $assets )
 		);
 	}
+
+	/**
+	 * @testdox can set 'runtime_js_handle'
+	 */
+	public function test_can_set_runtime_js_handle_manually() {
+		[ $enqueue, $assets ] = $this->prepare_enqueue_assets( null, 'wpackio-runtime-js' );
+		$this->assertEquals(
+			'wpackio-runtime-js',
+			$enqueue->getRuntimeJsHandle( $assets )
+		);
+	}
+
+
 }
