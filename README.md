@@ -135,3 +135,48 @@ Always require the latest version of `Wpackio\Enqueue`. The autoloader is set
 to load only one instance and will not conflict with existing class.
 
 However, if you want to load conflict free, kindly use [Strauss](https://github.com/BrianHenryIE/strauss).
+
+## Actions and Filters
+
+### Filter `wpackio_print_public_path`
+
+Accepts 3 parameters:
+
+- `$publichPathUrl` The URL that is used for the publicPath
+- `$appName` Application Name
+- `$outputPath` Output path relative to the root of this plugin/theme.
+
+
+Using this you can dynamically change the public path that is used for code splitting.
+This can be used to change the public path to a CDN.
+
+#### Example Code to replace all wpack.io public path with a cdn url
+
+```php
+add_filter( 'wpackio_print_public_path', 'set_public_path_to_cdn' );
+
+function set_public_path_to_cdn( $publichPathUrl ) {
+	$home_url = get_home_url(); // WordPress home url
+	$cdn_url = 'https://cdn.example.com'; // CDN url
+
+	// replace wordpress home url with cdn url
+	return str_replace($home_url, $cdn_url, $publichPathUrl);
+}
+```
+#### Example Code to the change the public path url only for a specific instance of wpack.io
+
+```php
+add_filter( 'wpackio_print_public_path', 'set_public_path_to_cdn', 10, 2 );
+
+function set_public_path_to_cdn( $publichPathUrl, $appName ) {
+	
+	// check for our plugin
+	if( 'myPlugin' !== $appName ) return $publichPathUrl;
+
+	$home_url = get_home_url(); // WordPress home url
+	$cdn_url = 'https://cdn.example.com'; // CDN url
+
+	// replace WordPress home url with cdn url
+	return str_replace($home_url, $cdn_url, $publichPathUrl);
+}
+```
